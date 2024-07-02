@@ -1,0 +1,13 @@
+[project]
+name = "cells"
+version = "0.1.0"
+description = "Project to deal with cells recognition"
+channels = ["conda-forge", "default", "bioconda"]
+platforms = ["linux-64"]
+
+[tasks]
+
+[dependencies]
+python = ">=3.12.4,<3.13"
+pixi-pycharm = ">=0.0.5,<0.1"
+jupyterlab = ">=4.2.3,<4.3"

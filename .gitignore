@@ -1,5 +1,5 @@
 # pixi environments
-.pixi
+.pixi/*
 *.egg-info
 
 # Byte-compiled / optimized / DLL files
