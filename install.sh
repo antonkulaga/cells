@@ -1,0 +1,1 @@
+pixi global install cellpose
