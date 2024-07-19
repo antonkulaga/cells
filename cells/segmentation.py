@@ -26,7 +26,7 @@ def load_grey_folder(folder: Path, extension: str = "tif") -> OrderedDict[Path, 
     return results
 
 
-def write_image_segmentation(img: np.ndarray, masks: np.ndarray, where: Optional[Path] = None) -> plt.Figure:
+def write_image_segmentation(img: np.ndarray, masks: np.ndarray, where: Optional[Path] = None, show_outline: bool = False) -> plt.Figure:
     img_out = img.copy()
 
     if img_out.shape[0] < 4:
@@ -39,9 +39,10 @@ def write_image_segmentation(img: np.ndarray, masks: np.ndarray, where: Optional
 
     # Create mask overlay
     overlay = mask_overlay(img_out.copy(), masks)
-    outlines = utils.masks_to_outlines(masks)
-    outX, outY = np.nonzero(outlines)
-    overlay[outX, outY] = np.array([255, 0, 0])  # pure red
+    if show_outline:
+        outlines = utils.masks_to_outlines(masks)
+        outX, outY = np.nonzero(outlines)
+        overlay[outX, outY] = np.array([255, 0, 0])  # pure red
 
     # Create before-after figure
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
@@ -71,22 +72,25 @@ def write_image_segmentation(img: np.ndarray, masks: np.ndarray, where: Optional
     return fig
 
 def write_folder_segmentation(folder: Path = Path("./data/test"),
-                              output: Optional[Path] = Path("./data/output"),
                               extension: str = "tif",
                               diameter: int = 15,
                               model_name: str = "cyto3",
-                              gpu: bool = False
+                              gpu: bool = False,
+                              show_outline: bool = False,
+                              output_name: str = "segmented"
                               ):
     image_dict = load_grey_folder(folder, extension=extension)
     channels = [0, 0]
     model = models.Cellpose(model_type=model_name, gpu=gpu)
     counts = []
+    output = folder / output_name
+    output.mkdir(exist_ok=True)
     logger.info(f"Segmenting {folder.absolute().resolve()} and writing output to {output.absolute().resolve()}")
     for f, image in image_dict.items():
         masks, flows, styles, diameters = model.eval(image, diameter=diameter, channels=channels)
         where = (output / f.name)
         logger.info(f"writing segmentation to {where}")
-        write_image_segmentation(image, masks, where)
+        write_image_segmentation(image, masks, where, show_outline=show_outline)
         counts.append((where.name, int(masks.max())))
     if len(counts) > 0:
         # Define the output file path using Pathlib
