@@ -32,7 +32,7 @@ def segment_folder(folder: Path = Path("./data/test"),
     def process_directory(directory: Path):
         # Process the current folder
         # Apply segmentation
-        if len(files.with_ext(extension).to_list()) > 0:
+        if len(files.with_ext(directory, extension).to_list()) > 0:
             write_folder_segmentation(directory, extension, diameter, model_name, gpu, show_outline, output_name)
         processed_paths.append(directory)
 
